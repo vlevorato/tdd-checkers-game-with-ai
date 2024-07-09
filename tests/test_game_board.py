@@ -116,6 +116,42 @@ class TestGameBoard(unittest.TestCase):
         # Move from empty square
         self.assertFalse(self.board.move_piece(3, 3, 4, 4))
 
+    def test_valid_white_piece_capture(self):
+        # Move a black piece to a position where it can be captured
+        self.board.move_piece(5, 0, 4, 1)
+        self.board.move_piece(4, 1, 3, 2)
+
+        # Capture the black piece
+        self.assertTrue(self.board.move_piece(2, 1, 4, 3))
+        self.assertIsNone(self.board.get_piece(2, 1))
+        self.assertIsNone(self.board.get_piece(3, 2))
+        self.assertIsNotNone(self.board.get_piece(4, 3))
+        self.assertEqual(self.board.get_piece(4, 3).color, 'white')
+
+    def test_valid_black_piece_capture(self):
+        # Move a white piece to a position where it can be captured
+        self.board.move_piece(2, 1, 3, 2)
+        self.board.move_piece(3, 2, 4, 3)
+
+        # Capture the white piece
+        self.assertTrue(self.board.move_piece(5, 2, 3, 4))
+        self.assertIsNone(self.board.get_piece(5, 2))
+        self.assertIsNone(self.board.get_piece(4, 3))
+        self.assertIsNotNone(self.board.get_piece(3, 4))
+        self.assertEqual(self.board.get_piece(3, 4).color, 'black')
+
+    def test_invalid_captures(self):
+        # Try to capture own piece
+        self.board.move_piece(2, 1, 3, 2)
+        self.assertFalse(self.board.move_piece(2, 3, 4, 1))
+
+        # Try to capture when there's no piece to capture
+        self.assertFalse(self.board.move_piece(2, 1, 4, 3))
+
+        # Try to capture in wrong direction (backwards for white)
+        self.board.move_piece(5, 0, 4, 1)
+        self.assertFalse(self.board.move_piece(2, 3, 0, 1))
+
 
 if __name__ == '__main__':
     unittest.main()

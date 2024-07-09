@@ -48,13 +48,47 @@ class GameBoard:
             board_str += '\n'
         return board_str
 
+    def _get_move_type(self, from_row, from_col, to_row, to_col):
+        if not (0 <= from_row < 8 and 0 <= from_col < 8 and 0 <= to_row < 8 and 0 <= to_col < 8):
+            return None
+
+        piece = self.squares[from_row][from_col].piece
+        if piece is None or self.squares[to_row][to_col].piece is not None:
+            return None
+
+        row_diff = to_row - from_row
+        col_diff = to_col - from_col
+
+        if piece.color == 'white':
+            if row_diff == 1 and abs(col_diff) == 1:
+                return 'move'
+            elif row_diff == 2 and abs(col_diff) == 2:
+                mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
+                if self.squares[mid_row][mid_col].piece and self.squares[mid_row][mid_col].piece.color == 'black':
+                    return 'capture'
+        else:  # black piece
+            if row_diff == -1 and abs(col_diff) == 1:
+                return 'move'
+            elif row_diff == -2 and abs(col_diff) == 2:
+                mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
+                if self.squares[mid_row][mid_col].piece and self.squares[mid_row][mid_col].piece.color == 'white':
+                    return 'capture'
+
+        return None
+
     def move_piece(self, from_row, from_col, to_row, to_col):
-        if not self._is_valid_move(from_row, from_col, to_row, to_col):
+        move_type = self._get_move_type(from_row, from_col, to_row, to_col)
+        if move_type is None:
             return False
 
         piece = self.squares[from_row][from_col].piece
         self.squares[to_row][to_col].piece = piece
         self.squares[from_row][from_col].piece = None
+
+        if move_type == 'capture':
+            mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
+            self.squares[mid_row][mid_col].piece = None
+
         return True
 
     def _is_valid_move(self, from_row, from_col, to_row, to_col):
