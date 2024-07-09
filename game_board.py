@@ -4,10 +4,16 @@ class Square:
         self.piece = None
 
 
+class Piece:
+    def __init__(self, color):
+        self.color = color
+
+
 class GameBoard:
     def __init__(self):
         self.squares = [[Square('white' if (i + j) % 2 == 0 else 'black')
                          for j in range(8)] for i in range(8)]
+        self._setup_initial_pieces()
 
     def get_adjacent_squares(self, row, col):
         adjacent = []
@@ -16,3 +22,15 @@ class GameBoard:
             if 0 <= new_row < 8 and 0 <= new_col < 8:
                 adjacent.append(self.squares[new_row][new_col])
         return adjacent
+
+    def _setup_initial_pieces(self):
+        for i in range(8):
+            for j in range(8):
+                if self.squares[i][j].color == 'black':
+                    if i < 3:
+                        self.squares[i][j].piece = Piece('white')
+                    elif i > 4:
+                        self.squares[i][j].piece = Piece('black')
+
+    def get_piece(self, row, col):
+        return self.squares[row][col].piece

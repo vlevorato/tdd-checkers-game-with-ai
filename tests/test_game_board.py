@@ -43,6 +43,37 @@ class TestGameBoard(unittest.TestCase):
         adjacent = self.board.get_adjacent_squares(3, 3)
         self.assertEqual(len(adjacent), 4)
 
+    def test_initial_piece_placement(self):
+        # Check white pieces
+        for i in range(3):
+            for j in range(8):
+                if (i + j) % 2 != 0:  # Black squares
+                    piece = self.board.get_piece(i, j)
+                    self.assertIsNotNone(piece)
+                    self.assertEqual(piece.color, 'white')
+
+        # Check black pieces
+        for i in range(5, 8):
+            for j in range(8):
+                if (i + j) % 2 != 0:  # Black squares
+                    piece = self.board.get_piece(i, j)
+                    self.assertIsNotNone(piece)
+                    self.assertEqual(piece.color, 'black')
+
+        # Check middle rows are empty
+        for i in range(3, 5):
+            for j in range(8):
+                piece = self.board.get_piece(i, j)
+                self.assertIsNone(piece)
+
+    def test_piece_count(self):
+        white_count = sum(1 for row in self.board.squares for square in row
+                          if square.piece and square.piece.color == 'white')
+        black_count = sum(1 for row in self.board.squares for square in row
+                          if square.piece and square.piece.color == 'black')
+        self.assertEqual(white_count, 12)
+        self.assertEqual(black_count, 12)
+
 
 if __name__ == '__main__':
     unittest.main()
