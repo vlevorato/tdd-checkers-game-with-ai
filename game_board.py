@@ -34,3 +34,16 @@ class GameBoard:
 
     def get_piece(self, row, col):
         return self.squares[row][col].piece
+
+    def display(self):
+        board_str = "  0 1 2 3 4 5 6 7\n"
+        for i, row in enumerate(self.squares):
+            board_str += f"{i} "
+            for square in row:
+                if square.piece is None:
+                    board_str += '.' if square.color == 'black' else ' '
+                else:
+                    board_str += 'O' if square.piece.color == 'white' else 'X'
+                board_str += ' '
+            board_str += '\n'
+        return board_str

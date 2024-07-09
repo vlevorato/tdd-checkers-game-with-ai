@@ -74,6 +74,20 @@ class TestGameBoard(unittest.TestCase):
         self.assertEqual(white_count, 12)
         self.assertEqual(black_count, 12)
 
+    def test_board_display(self):
+        expected_display = (
+            "  0 1 2 3 4 5 6 7\n"
+            "0   O   O   O   O \n"
+            "1 O   O   O   O   \n"
+            "2   O   O   O   O \n"
+            "3 .   .   .   .   \n"
+            "4   .   .   .   . \n"
+            "5 X   X   X   X   \n"
+            "6   X   X   X   X \n"
+            "7 X   X   X   X   \n"
+        )
+        self.assertEqual(self.board.display(), expected_display)
+
 
 if __name__ == '__main__':
     unittest.main()
