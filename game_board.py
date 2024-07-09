@@ -47,3 +47,32 @@ class GameBoard:
                 board_str += ' '
             board_str += '\n'
         return board_str
+
+    def move_piece(self, from_row, from_col, to_row, to_col):
+        if not self._is_valid_move(from_row, from_col, to_row, to_col):
+            return False
+
+        piece = self.squares[from_row][from_col].piece
+        self.squares[to_row][to_col].piece = piece
+        self.squares[from_row][from_col].piece = None
+        return True
+
+    def _is_valid_move(self, from_row, from_col, to_row, to_col):
+        # Check if the move is within the board
+        if not (0 <= from_row < 8 and 0 <= from_col < 8 and 0 <= to_row < 8 and 0 <= to_col < 8):
+            return False
+
+        # Check if there's a piece at the starting position
+        piece = self.squares[from_row][from_col].piece
+        if piece is None:
+            return False
+
+        # Check if the destination is empty
+        if self.squares[to_row][to_col].piece is not None:
+            return False
+
+        # Check if the move is diagonal and forward
+        if piece.color == 'white':
+            return to_row == from_row + 1 and abs(to_col - from_col) == 1
+        else:  # black piece
+            return to_row == from_row - 1 and abs(to_col - from_col) == 1

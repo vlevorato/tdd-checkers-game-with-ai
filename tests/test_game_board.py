@@ -88,6 +88,34 @@ class TestGameBoard(unittest.TestCase):
         )
         self.assertEqual(self.board.display(), expected_display)
 
+    def test_valid_white_piece_move(self):
+        self.assertTrue(self.board.move_piece(2, 1, 3, 0))
+        self.assertIsNone(self.board.get_piece(2, 1))
+        self.assertIsNotNone(self.board.get_piece(3, 0))
+        self.assertEqual(self.board.get_piece(3, 0).color, 'white')
+
+    def test_valid_black_piece_move(self):
+        self.assertTrue(self.board.move_piece(5, 0, 4, 1))
+        self.assertIsNone(self.board.get_piece(5, 0))
+        self.assertIsNotNone(self.board.get_piece(4, 1))
+        self.assertEqual(self.board.get_piece(4, 1).color, 'black')
+
+    def test_invalid_moves(self):
+        # Move to occupied square
+        self.assertFalse(self.board.move_piece(2, 1, 1, 0))
+
+        # Move backwards
+        self.assertFalse(self.board.move_piece(2, 1, 1, 2))
+
+        # Move horizontally
+        self.assertFalse(self.board.move_piece(2, 1, 2, 2))
+
+        # Move more than one square
+        self.assertFalse(self.board.move_piece(2, 1, 4, 3))
+
+        # Move from empty square
+        self.assertFalse(self.board.move_piece(3, 3, 4, 4))
+
 
 if __name__ == '__main__':
     unittest.main()
