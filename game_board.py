@@ -59,35 +59,61 @@ class GameBoard:
         row_diff = to_row - from_row
         col_diff = to_col - from_col
 
-        if piece.color == 'white':
-            if row_diff == 1 and abs(col_diff) == 1:
+        if abs(row_diff) == 1 and abs(col_diff) == 1:
+            if (piece.color == 'white' and row_diff > 0) or (piece.color == 'black' and row_diff < 0):
                 return 'move'
-            elif row_diff == 2 and abs(col_diff) == 2:
-                mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
-                if self.squares[mid_row][mid_col].piece and self.squares[mid_row][mid_col].piece.color == 'black':
-                    return 'capture'
-        else:  # black piece
-            if row_diff == -1 and abs(col_diff) == 1:
-                return 'move'
-            elif row_diff == -2 and abs(col_diff) == 2:
-                mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
-                if self.squares[mid_row][mid_col].piece and self.squares[mid_row][mid_col].piece.color == 'white':
-                    return 'capture'
+        elif abs(row_diff) == 2 and abs(col_diff) == 2:
+            mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
+            if self.squares[mid_row][mid_col].piece and self.squares[mid_row][mid_col].piece.color != piece.color:
+                return 'capture'
 
         return None
 
-    def move_piece(self, from_row, from_col, to_row, to_col):
-        move_type = self._get_move_type(from_row, from_col, to_row, to_col)
-        if move_type is None:
+    def reset_moves(self, moves, piece, n_moves):
+        self.squares[moves[0][0]][moves[0][1]].piece = piece
+        for i in range(1, n_moves):
+            self.squares[moves[i][0]][moves[i][1]].piece = None
+
+    def move_piece(self, moves):
+        if not moves or len(moves) < 2:
             return False
 
+        from_row, from_col = moves[0]
         piece = self.squares[from_row][from_col].piece
-        self.squares[to_row][to_col].piece = piece
-        self.squares[from_row][from_col].piece = None
+        if piece is None:
+            return False
 
-        if move_type == 'capture':
-            mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
-            self.squares[mid_row][mid_col].piece = None
+        captured_pieces = []
+        for i in range(1, len(moves)):
+            from_row, from_col = moves[i - 1]
+            to_row, to_col = moves[i]
+
+            move_type = self._get_move_type(from_row, from_col, to_row, to_col)
+            if move_type is None:
+                self.reset_moves(moves, piece, i)
+                return False
+
+            if i > 1 and move_type != 'capture':
+                self.reset_moves(moves, piece, i)
+                return False
+
+            if move_type == 'capture':
+                mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2
+                captured_piece = self.squares[mid_row][mid_col].piece
+                if captured_piece is None or captured_piece.color == piece.color:
+                    self.reset_moves(moves, piece, i)
+                    return False
+                captured_pieces.append((mid_row, mid_col))
+                self.squares[to_row][to_col].piece = piece
+                self.squares[from_row][from_col].piece = None
+
+        # If we've made it here, the move sequence is valid. Let's execute it.
+        for from_row, from_col in captured_pieces:
+            self.squares[from_row][from_col].piece = None
+
+        final_row, final_col = moves[-1]
+        self.squares[final_row][final_col].piece = piece
+        self.squares[moves[0][0]][moves[0][1]].piece = None
 
         return True
 
