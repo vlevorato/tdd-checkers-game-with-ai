@@ -7,6 +7,7 @@ class Square:
 class Piece:
     def __init__(self, color):
         self.color = color
+        self.is_king = False
 
 
 class GameBoard:
@@ -114,6 +115,10 @@ class GameBoard:
         final_row, final_col = moves[-1]
         self.squares[final_row][final_col].piece = piece
         self.squares[moves[0][0]][moves[0][1]].piece = None
+
+        # Check if the piece should become a king
+        if (piece.color == 'white' and final_row == 7) or (piece.color == 'black' and final_row == 0):
+            piece.is_king = True
 
         return True
 

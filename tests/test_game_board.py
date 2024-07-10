@@ -254,6 +254,51 @@ class TestGameBoard(unittest.TestCase):
         self.assertIsNotNone(self.board.get_piece(6, 5))
         self.assertIsNotNone(self.board.get_piece(7, 6))
 
+    def test_white_piece_becomes_king(self):
+        # Setup: Move a white piece to the last row
+        self.board = GameBoard()
+        self.board.squares[7][0].piece = None
+        self.board.squares[6][1].piece = Piece('white')
+
+        # Action: Move the white piece to the last row
+        self.assertTrue(self.board.move_piece([(6, 1), (7, 0)]))
+
+        # Assert: The piece should now be a king
+        piece = self.board.get_piece(7, 0)
+        self.assertIsNotNone(piece)
+        self.assertEqual(piece.color, 'white')
+        self.assertTrue(piece.is_king)
+
+    def test_black_piece_becomes_king(self):
+        # Setup: Move a black piece to the last row
+        self.board = GameBoard()
+        self.board.squares[0][1].piece = None
+        self.board.squares[1][0].piece = Piece('black')
+
+        # Action: Move the black piece to the last row
+        self.assertTrue(self.board.move_piece([(1, 0), (0, 1)]))
+
+        # Assert: The piece should now be a king
+        piece = self.board.get_piece(0, 1)
+        self.assertIsNotNone(piece)
+        self.assertEqual(piece.color, 'black')
+        self.assertTrue(piece.is_king)
+
+    def test_piece_does_not_become_king_on_other_rows(self):
+        # Setup: Move a piece to a non-last row
+        self.board = GameBoard()
+        self.board.squares[2][1].piece = None
+        self.board.squares[3][2].piece = Piece('white')
+
+        # Action: Move the piece
+        self.assertTrue(self.board.move_piece([(3, 2), (4, 3)]))
+
+        # Assert: The piece should not be a king
+        piece = self.board.get_piece(4, 3)
+        self.assertIsNotNone(piece)
+        self.assertEqual(piece.color, 'white')
+        self.assertFalse(piece.is_king)
+
 
 if __name__ == '__main__':
     unittest.main()
