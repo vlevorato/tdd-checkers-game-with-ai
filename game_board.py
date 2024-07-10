@@ -44,7 +44,16 @@ class GameBoard:
                 if square.piece is None:
                     board_str += '.' if square.color == 'black' else ' '
                 else:
-                    board_str += 'O' if square.piece.color == 'white' else 'X'
+                    if square.piece.color == 'white':
+                        if square.piece.is_king:
+                            board_str += 'O'
+                        else:
+                            board_str += 'o'
+                    else:
+                        if square.piece.is_king:
+                            board_str += 'X'
+                        else:
+                            board_str += 'x'
                 board_str += ' '
             board_str += '\n'
         return board_str
@@ -61,7 +70,7 @@ class GameBoard:
         col_diff = to_col - from_col
 
         if abs(row_diff) == 1 and abs(col_diff) == 1:
-            if (piece.color == 'white' and row_diff > 0) or (piece.color == 'black' and row_diff < 0):
+            if piece.is_king or (piece.color == 'white' and row_diff > 0) or (piece.color == 'black' and row_diff < 0):
                 return 'move'
         elif abs(row_diff) == 2 and abs(col_diff) == 2:
             mid_row, mid_col = (from_row + to_row) // 2, (from_col + to_col) // 2

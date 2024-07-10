@@ -77,14 +77,14 @@ class TestGameBoard(unittest.TestCase):
     def test_board_display(self):
         expected_display = (
             "  0 1 2 3 4 5 6 7\n"
-            "0   O   O   O   O \n"
-            "1 O   O   O   O   \n"
-            "2   O   O   O   O \n"
+            "0   o   o   o   o \n"
+            "1 o   o   o   o   \n"
+            "2   o   o   o   o \n"
             "3 .   .   .   .   \n"
             "4   .   .   .   . \n"
-            "5 X   X   X   X   \n"
-            "6   X   X   X   X \n"
-            "7 X   X   X   X   \n"
+            "5 x   x   x   x   \n"
+            "6   x   x   x   x \n"
+            "7 x   x   x   x   \n"
         )
         self.assertEqual(self.board.display(), expected_display)
 
@@ -298,6 +298,59 @@ class TestGameBoard(unittest.TestCase):
         self.assertIsNotNone(piece)
         self.assertEqual(piece.color, 'white')
         self.assertFalse(piece.is_king)
+
+    def test_king_move_backwards(self):
+        self.board = GameBoard()
+        self.board.squares[5][2].piece = Piece('white')
+        self.board.squares[5][2].piece.is_king = True
+
+        # Move backwards
+        self.assertTrue(self.board.move_piece([(5, 2), (4, 1)]))
+        self.assertIsNone(self.board.get_piece(5, 2))
+        self.assertIsNotNone(self.board.get_piece(4, 1))
+        self.assertEqual(self.board.get_piece(4, 1).color, 'white')
+        self.assertTrue(self.board.get_piece(4, 1).is_king)
+
+    def test_king_capture_backwards(self):
+        self.board = GameBoard()
+        self.board.squares[5][2].piece = Piece('white')
+        self.board.squares[5][2].piece.is_king = True
+        self.board.squares[4][3].piece = Piece('black')
+
+        # Capture backwards
+        self.assertTrue(self.board.move_piece([(5, 2), (3, 4)]))
+        self.assertIsNone(self.board.get_piece(5, 2))
+        self.assertIsNone(self.board.get_piece(4, 3))
+        self.assertIsNotNone(self.board.get_piece(3, 4))
+        self.assertEqual(self.board.get_piece(3, 4).color, 'white')
+        self.assertTrue(self.board.get_piece(3, 4).is_king)
+
+    def test_king_multiple_capture(self):
+        self.board = GameBoard()
+        self.board.squares[5][2].piece = Piece('white')
+        self.board.squares[5][2].piece.is_king = True
+        self.board.squares[2][3].piece = Piece('black')
+        self.board.squares[4][3].piece = Piece('black')
+        self.board.squares[1][2].piece = None
+
+        # Multiple capture, changing direction
+        self.assertTrue(self.board.move_piece([(5, 2), (3, 4), (1, 2)]))
+        self.assertIsNone(self.board.get_piece(5, 2))
+        self.assertIsNone(self.board.get_piece(4, 3))
+        self.assertIsNone(self.board.get_piece(2, 3))
+        self.assertIsNotNone(self.board.get_piece(1, 2))
+        self.assertEqual(self.board.get_piece(1, 2).color, 'white')
+        self.assertTrue(self.board.get_piece(1, 2).is_king)
+
+    def test_king_invalid_long_move(self):
+        self.board = GameBoard()
+        self.board.squares[5][2].piece = Piece('white')
+        self.board.squares[5][2].piece.is_king = True
+
+        # Try to move more than one square
+        self.assertFalse(self.board.move_piece([(5, 2), (3, 4)]))
+        self.assertIsNotNone(self.board.get_piece(5, 2))
+        self.assertIsNone(self.board.get_piece(3, 4))
 
 
 if __name__ == '__main__':
